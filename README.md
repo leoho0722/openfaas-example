@@ -43,6 +43,12 @@ helm repo update
 helm upgrade openfaas --install openfaas/openfaas --namespace openfaas
 ```
 
+#### Step 3: Expose OpenFaaS Gateway Service to LoadBalancer
+
+```shell
+kubectl patch svc gateway-external -n openfaas -p '{"spec":{"type": "LoadBalancer"}}'
+```
+
 #### Other
 
 Please reference to OpenFaaS Official Documentation.
