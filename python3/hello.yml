@@ -1,9 +1,0 @@
-version: 1.0
-provider:
-  name: openfaas
-  gateway: http://127.0.0.1:8080
-functions:
-  hello:
-    lang: python3-flask-debian
-    handler: ./hello
-    image: leoho0722/hello-world-python3:latest
