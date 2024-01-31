@@ -54,4 +54,4 @@ curl -H "Content-Type: application/json" -X POST -d '{"message": "OpenFaaS Examp
 Choose JSON radio button first, and input some jsonData in Request Body.
 Finally, press invoke button to test, and Response body will be shown.
 
-![OpenFaaS WebUI test](./hello/assets/OpenFaaS%20WebUI%20test.png)
+![OpenFaaS WebUI test](./assets/OpenFaaS%20WebUI%20test.png)
