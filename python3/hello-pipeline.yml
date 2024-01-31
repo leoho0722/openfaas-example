@@ -8,22 +8,27 @@ functions:
     handler: ./hello-1
     image: leoho0722/hello-pipeline-1:latest
     environment:
-      write_debug: true
+      next_stage: hello-2
+      gateway: http://127.0.0.1:8080
   hello-2:
     lang: python3-flask-debian
     handler: ./hello-2
     image: leoho0722/hello-pipeline-2:latest
     environment:
-      write_debug: true
+      next_stage: hello-3
+      gateway: http://127.0.0.1:8080
   hello-3:
     lang: python3-flask-debian
     handler: ./hello-3
     image: leoho0722/hello-pipeline-3:latest
     environment:
-      write_debug: true
+      next_stage: hello-4
+      gateway: http://127.0.0.1:8080
   hello-4:
     lang: python3-flask-debian
     handler: ./hello-4
     image: leoho0722/hello-pipeline-4:latest
     environment:
-      write_debug: true
+      next_stage: hello-1
+      gateway: http://127.0.0.1:8080
+      loop: true
