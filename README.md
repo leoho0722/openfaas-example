@@ -32,7 +32,7 @@ Please reference to OpenFaaS Official Documentation.
 #### Step 1: Create Kubernetes Namespace
 
 ```shell
-kubectl create ns openfaas && kubectl create ns openfaas-fn
+kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
 ```
 
 #### Step 2: Helm charts
@@ -47,6 +47,19 @@ helm upgrade openfaas --install openfaas/openfaas --namespace openfaas
 
 ```shell
 kubectl patch svc gateway-external -n openfaas -p '{"spec":{"type": "LoadBalancer"}}'
+```
+
+#### Step 4: Get OpenFaaS WebUI Password
+
+```shell
+PASSWORD=$(kubectl -n openfaas get secret basic-auth -o jsonpath="{.data.basic-auth-password}" | base64 --decode) && \
+echo "OpenFaaS admin password: $PASSWORD"
+```
+
+#### Step 5: Login OpenFaaS WebUI via credential
+
+```shell
+faas-cli login -u admin -p $PASSWORD
 ```
 
 #### Other
