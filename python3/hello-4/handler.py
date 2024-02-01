@@ -1,7 +1,9 @@
 import logging
 import os
-
+import threading
 from enum import Enum, unique
+from time import sleep
+
 import requests
 
 logging.basicConfig(level=logging.DEBUG)
@@ -24,7 +26,25 @@ def handle(req):
             "body": body,
         }
 
-    logging.debug("function hello-4 running...\n")
+    def current_task_finish_and_requeue_next_task(body, next_stage):
+        """Finish the current task and requeue the next one.
+
+        Args:
+            body (dict): request body
+            next_stage (str): next pipeline stage name
+        """
+
+        def trigger():
+            _ = requests.post(
+                f"http://gateway.openfaas:8080/function/{next_stage}",
+                json=body
+            )
+
+            logging.info(f"trigger function {next_stage}\n")
+
+        threading.Thread(target=trigger).start()
+
+    logging.info("function hello-4 running...\n")
 
     if req.method == 'POST':
         next_stage = os.getenv("next_stage")
@@ -33,12 +53,13 @@ def handle(req):
         if not next_is_valid:
             return response(400, "Invalid next stage name")
 
-        loop = os.getenv("loop")  # Whether to repeat the pipeline execution
+        sleep(2)  # Simulate a long-running task
 
-        if loop:
-            gateway_url = os.getenv("gateway")
+        # Whether to repeat the pipeline execution
+        requeue = os.getenv("requeue")
 
-            req_body = {
+        if eval(str(requeue).title()):
+            body = {
                 "stage": {
                     "current": {
                         "status": "finished",
@@ -50,17 +71,18 @@ def handle(req):
                     }
                 },
             }
-            _ = requests.post(
-                f"{gateway_url}/function/{next_stage}",
-                json=req_body
-            )
 
-            logging.debug(
-                "function hello-4 finished, loop to run function hello-1\n")
+            logging.info(
+                f"function hello-4 will trigger function {next_stage}\n")
 
-            return response(200, req_body)
+            current_task_finish_and_requeue_next_task(body, next_stage)
+
+            logging.info(
+                "function hello-4 finished, requeue function hello-1\n")
+
+            return response(200, body)
         else:
-            res_body = {
+            body = {
                 "stage": {
                     "current": {
                         "status": "finished",
@@ -69,9 +91,9 @@ def handle(req):
                 },
             }
 
-            logging.debug("function hello-4 finished\n")
+            logging.info("function hello-4 finished\n")
 
-            return response(200, res_body)
+            return response(200, body)
     else:
         return response(405, "Method not allowed")
 

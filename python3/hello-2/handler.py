@@ -1,9 +1,10 @@
 import logging
 import os
-
+import threading
 from enum import Enum, unique
-import requests
+from time import sleep
 
+import requests
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -28,7 +29,25 @@ def handle(req):
             "body": body,
         }
 
-    logging.debug("function hello-2 running...\n")
+    def current_task_finish_and_start_next_task(body, next_stage):
+        """Finish the current task and start the next one.
+
+        Args:
+            body (dict): request body
+            next_stage (str): next pipeline stage name
+        """
+
+        def trigger():
+            _ = requests.post(
+                f"http://gateway.openfaas:8080/function/{next_stage}",
+                json=body
+            )
+
+            logging.info(f"trigger function {next_stage}\n")
+
+        threading.Thread(target=trigger).start()
+
+    logging.info("function hello-2 running...\n")
 
     if req.method == 'POST':
         next_stage = os.getenv("next_stage")
@@ -37,7 +56,7 @@ def handle(req):
         if not next_is_valid:
             return response(400, "Invalid next stage name")
 
-        gateway_url = os.getenv("gateway")
+        sleep(2)  # Simulate a long-running task
 
         req_body = {
             "stage": {
@@ -51,12 +70,12 @@ def handle(req):
                 }
             },
         }
-        _ = requests.post(
-            f"{gateway_url}/function/{next_stage}",
-            json=req_body
-        )
 
-        logging.debug("function hello-2 finished\n")
+        logging.info(f"function hello-2 will trigger function {next_stage}\n")
+
+        current_task_finish_and_start_next_task(req_body, next_stage)
+
+        logging.info("function hello-2 finished\n")
 
         return response(200, req_body)
     else:
