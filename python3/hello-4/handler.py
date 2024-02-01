@@ -6,17 +6,20 @@ from time import sleep
 
 import requests
 
+
 logging.basicConfig(level=logging.DEBUG)
 
 
 def handle(req):
     """Handle a request to the function.
+
     Args:
-        req (flask.request): request body
+        req (flask.request): Request body
     """
 
     def response(status, body):
         """Create an HTTP response.
+
         Args:
             status (int): HTTP status code
             body (any): HTTP response body
@@ -30,8 +33,8 @@ def handle(req):
         """Finish the current task and requeue the next one.
 
         Args:
-            body (dict): request body
-            next_stage (str): next pipeline stage name
+            body (dict): Request body
+            next_stage (str): Next pipeline stage name
         """
 
         def trigger():
@@ -40,11 +43,11 @@ def handle(req):
                 json=body
             )
 
-            logging.info(f"trigger function {next_stage}\n")
+            logging.info(f"Trigger function {next_stage}\n")
 
         threading.Thread(target=trigger).start()
 
-    logging.info("function hello-4 running...\n")
+    logging.info("Function hello-4 running...\n")
 
     if req.method == 'POST':
         next_stage = os.getenv("next_stage")
@@ -73,12 +76,12 @@ def handle(req):
             }
 
             logging.info(
-                f"function hello-4 will trigger function {next_stage}\n")
+                f"Function hello-4 will trigger function {next_stage}\n")
 
             current_task_finish_and_requeue_next_task(body, next_stage)
 
             logging.info(
-                "function hello-4 finished, requeue function hello-1\n")
+                "Function hello-4 finished, requeue function hello-1\n")
 
             return response(200, body)
         else:
@@ -91,7 +94,7 @@ def handle(req):
                 },
             }
 
-            logging.info("function hello-4 finished\n")
+            logging.info("Function hello-4 finished\n")
 
             return response(200, body)
     else:
@@ -108,16 +111,18 @@ class PipelineStage(Enum):
 
 def get_stage_name(stage):
     """Get the name of a pipeline stage.
+
     Args:
-        stage (str): pipeline stage name
+        stage (str): Pipeline stage name
     """
     return PipelineStage(stage).value
 
 
 def is_valid_stage(stage):
     """Check if a pipeline stage is valid.
+
     Args:
-        stage (str): pipeline stage name
+        stage (str): Pipeline stage name
     """
     try:
         get_stage_name(stage)

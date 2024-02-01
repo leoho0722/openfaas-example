@@ -6,6 +6,7 @@ from time import sleep
 
 import requests
 
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -33,8 +34,8 @@ def handle(req):
         """Finish the current task and start the next one.
 
         Args:
-            body (dict): request body
-            next_stage (str): next pipeline stage name
+            body (dict): Request body
+            next_stage (str): Next pipeline stage name
         """
 
         def trigger():
@@ -43,11 +44,11 @@ def handle(req):
                 json=body
             )
 
-            logging.info(f"trigger function {next_stage}\n")
+            logging.info(f"Trigger function {next_stage}\n")
 
         threading.Thread(target=trigger).start()
 
-    logging.info("function hello-2 running...\n")
+    logging.info("Function hello-2 running...\n")
 
     if req.method == 'POST':
         next_stage = os.getenv("next_stage")
@@ -71,11 +72,11 @@ def handle(req):
             },
         }
 
-        logging.info(f"function hello-2 will trigger function {next_stage}\n")
+        logging.info(f"Function hello-2 will trigger function {next_stage}\n")
 
         current_task_finish_and_start_next_task(req_body, next_stage)
 
-        logging.info("function hello-2 finished\n")
+        logging.info("Function hello-2 finished\n")
 
         return response(200, req_body)
     else:
