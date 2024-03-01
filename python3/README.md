@@ -8,6 +8,8 @@
 
 ```shell
 faas-cli template pull https://github.com/openfaas/python-flask-template
+faas-cli template pull https://github.com/openfaas/templates
+faas-cli template pull https://github.com/openfaas/golang-http-template
 ```
 
 ## Step 2: Create New Function
@@ -17,13 +19,13 @@ faas-cli template pull https://github.com/openfaas/python-flask-template
 TEMPLATE: python3-flash-debian
 HANDLER: hello
 
-In this case, params ```TEMPLATE``` is ```python3-flash-debian``` and ```HANDLER``` is ```hello```
+In this case, params ```TEMPLATE``` is ```python3-flask-debian``` and ```HANDLER``` is ```hello```
 
 ```shell
 faas-cli new --lang <TEMPLATE> <HANDLER>
 
 # Example:
-# faas-cli new --lang python3-flash-debian hello
+# faas-cli new --lang python3-flask-debian hello
 ```
 
 ## Step 3: Build、Push Image and Deploy
